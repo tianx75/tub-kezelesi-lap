@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>THE ULTIMATE BEAUTY - Kezelési Lap</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f5f0;
+    color: #2c2c2c;
+    padding: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    padding: 24px 16px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #d4af37;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+  .header h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 6px; }
+  .header p { font-size: 13px; color: #c0c0c0; }
+  .header .date-display { color: #fff; font-size: 14px; margin-top: 8px; }
+  .section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .section h2 {
+    font-size: 17px;
+    color: #1a1a2e;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .section h3 {
+    font-size: 14px;
+    color: #666;
+    margin: 14px 0 8px;
+    font-weight: 600;
+  }
+  label { display: block; font-size: 14px; margin-bottom: 4px; color: #555; }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 12px;
+    background: #fafafa;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #d4af37;
+    background: #fff;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  .checkbox-group { margin-bottom: 12px; }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .checkbox-item:active { background: #f0ebe0; }
+  .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    accent-color: #d4af37;
+    flex-shrink: 0;
+  }
+  .checkbox-item span { font-size: 14px; line-height: 1.3; }
+  .yn-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .yn-group .yn-label { flex: 1; font-size: 13px; line-height: 1.3; }
+  .yn-btn {
+    padding: 8px 16px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 50px;
+    text-align: center;
+  }
+  .yn-btn.selected-yes { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+  .yn-btn.selected-no { background: #27ae60; color: #fff; border-color: #27ae60; }
+  .pain-scale {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 12px;
+  }
+  .pain-btn {
+    flex: 1;
+    padding: 12px 4px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .pain-btn.selected { color: #fff; }
+  .pain-btn[data-v="0"].selected { background: #27ae60; border-color: #27ae60; }
+  .pain-btn[data-v="1"].selected { background: #8bc34a; border-color: #8bc34a; }
+  .pain-btn[data-v="2"].selected { background: #ffc107; border-color: #ffc107; }
+  .pain-btn[data-v="3"].selected { background: #ff9800; border-color: #ff9800; }
+  .pain-btn[data-v="4"].selected { background: #ff5722; border-color: #ff5722; }
+  .pain-btn[data-v="5"].selected { background: #e74c3c; border-color: #e74c3c; }
+  .warning-box {
+    background: #fff3cd;
+    border: 1.5px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .warning-box strong { color: #e74c3c; }
+  .consent-text {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    border: 1px solid #eee;
+  }
+  .signature-area {
+    border: 2px dashed #d4af37;
+    border-radius: 12px;
+    margin: 12px 0;
+    position: relative;
+    background: #fff;
+    touch-action: none;
+  }
+  .signature-area canvas {
+    width: 100%;
+    height: 150px;
+    display: block;
+    border-radius: 10px;
+  }
+  .sig-label {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    font-size: 11px;
+    color: #999;
+    pointer-events: none;
+  }
+  .sig-clear {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: #eee;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .row { display: flex; gap: 12px; }
+  .row > div { flex: 1; }
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: #1a1a2e;
+    color: #d4af37;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-config {
+    width: 100%;
+    padding: 10px;
+    background: #eee;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .success-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(26,26,46,0.95);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
+    text-align: center;
+    padding: 40px;
+  }
+  .success-overlay.show { display: flex; }
+  .success-overlay .checkmark { font-size: 80px; margin-bottom: 20px; }
+  .success-overlay h2 { font-size: 24px; color: #d4af37; margin-bottom: 12px; }
+  .success-overlay p { font-size: 16px; color: #ccc; margin-bottom: 12px; }
+  .success-overlay .sub { font-size: 13px; color: #888; margin-bottom: 24px; }
+  .divider { height: 1px; background: #eee; margin: 16px 0; }
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .status-dot.green { background: #27ae60; }
+  .status-dot.red { background: #e74c3c; }
+  .status-dot.yellow { background: #f39c12; }
+  .config-panel {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 2px solid #d4af37;
+  }
+  .config-panel.show { display: block; }
+  .config-panel h2 { font-size: 16px; color: #1a1a2e; margin-bottom: 12px; }
+  .config-panel .step { background: #f8f8f8; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+  .config-panel .step strong { color: #1a1a2e; }
+  .config-panel code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .config-panel pre {
+    background: #1a1a2e;
+    color: #d4af37;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    overflow-x: auto;
+    margin: 8px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .sheets-status {
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  @media print {
+    body { padding: 0; background: #fff; }
+    .section { box-shadow: none; break-inside: avoid; }
+    .btn-submit, .btn-secondary, .btn-config, .sig-clear, .no-print, .config-panel, .sheets-status { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>THE ULTIMATE BEAUTY</h1>
+    <p>Kezelési Lap - Páciens adatlap + Hozzájáruló nyilatkozat</p>
+    <div class="date-display" id="todayDate"></div>
+  </div>
+
+  <!-- Google Sheets status bar -->
+  <div class="sheets-status no-print" id="sheetsStatus">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Betöltés...</span>
+  </div>
+
+  <!-- Config panel (hidden by default) -->
+  <div class="config-panel no-print" id="configPanel">
+    <h2>Google Sheets beállítás</h2>
+    <div class="step">
+      <strong>1. lépés:</strong> Nyisd meg a Google Sheets-et és hozz létre egy üres táblázatot<br>
+      <strong>2. lépés:</strong> Menj: <code>Bővítmények → Apps Script</code><br>
+      <strong>3. lépés:</strong> Töröld a meglévő kódot és illeszd be az alábbit:
+    </div>
+    <pre id="appsScriptCode">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+
+  // Header row if empty
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      'Időpont', 'Név', 'Születési dátum', 'Telefon', 'E-mail', 'Lakcím',
+      'Kapcsolattartó', 'Fő panasz', 'Szív-ér', 'Magas vérnyomás',
+      'Diabetes', 'Pajzsmirigy', 'Máj/vese', 'Autoimmun',
+      'Vérzékenység', 'Epilepszia', 'Daganat', 'Allergia',
+      'Allergia részlet', 'Aktív bőrbetegség', 'Keloid', 'Melasma',
+      'Nem ép bőr', 'Terhesség', 'Szoptatás', 'Nőgyógy.',
+      'Pacemaker', 'Fém implant', 'Fogász. implant',
+      'Véralvadásgátló', 'Izomlazító', 'Fényérz. gy.', 'Antibiotikum',
+      'Ellenjavallat OK', 'Ellenj. megj.', 'Vizit típus',
+      'Fő probléma', 'Kezelő neve', 'Fotók',
+      'Kezelések', 'Egyéb kezelés', 'Protokoll',
+      'Mai kezelés', 'Időtartam', 'Régiók', 'Anyagok',
+      'Fájdalom', 'Mellékhatás', 'Mellékh. leírás',
+      'Utókezelés', 'Egyéb utókezelés',
+      'Stat. hozzájárulás', 'Fotó hozzájárulás', 'Ált. hozzájárulás',
+      'Páciens aláírás', 'Kezelő aláírás'
+    ]);
+  }
+
+  sheet.appendRow([
+    data.timestamp || new Date().toISOString(),
+    data.nev || '',
+    data.szuletes || '',
+    data.telefon || '',
+    data.email || '',
+    data.lakcim || '',
+    data.kapcsolattarto || '',
+    data.fo_panasz || '',
+    data.health_0 || '', data.health_1 || '',
+    data.health_2 || '', data.health_3 || '',
+    data.health_4 || '', data.health_5 || '',
+    data.health_6 || '', data.health_7 || '',
+    data.health_8 || '', data.health_9 || '',
+    data.allergia_reszlet || '',
+    data.skin_0 || '', data.skin_1 || '',
+    data.skin_2 || '', data.skin_3 || '',
+    data.female_0 || '', data.female_1 || '', data.female_2 || '',
+    data.implant_0 || '', data.implant_1 || '', data.implant_2 || '',
+    data.med_0 || '', data.med_1 || '', data.med_2 || '', data.med_3 || '',
+    data.ellenjavallat_kizarva || '',
+    data.ellenjavallat_megj || '',
+    data.vizit_tipus || '',
+    data.fo_problema || '',
+    data.kezelo_neve || '',
+    data.fotok || '',
+    data.kezelesek || '',
+    data.egyeb_kezeles || '',
+    data.protokoll || '',
+    data.mai_kezeles_tipus || '',
+    data.idotartam || '',
+    data.kezelt_regiok || '',
+    data.anyagok || '',
+    data.fajdalom || '',
+    data.mellekhat || '',
+    data.mellekhat_leiras || '',
+    data.utokezelesek || '',
+    data.egyeb_utokezeles || '',
+    data.consent_stat || '',
+    data.consent_foto || '',
+    data.consent_altalanos || '',
+    data.sig1 ? 'VAN' : 'NINCS',
+    data.sig2 ? 'VAN' : 'NINCS'
+  ]);
+
+  return ContentService.createTextOutput(
+    JSON.stringify({status: 'ok'})
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(
+    JSON.stringify({status: 'ok', message: 'TUB Kezelési Lap API aktív'})
+  ).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+    <div class="step">
+      <strong>4. lépés:</strong> Kattints: <code>Üzembe helyezés → Új üzembe helyezés</code><br>
+      → Típus: <strong>Webalkalmazás</strong><br>
+      → Ki hajthatja végre: <strong>Bárki</strong><br>
+      → Hozzáférés: <strong>Bárki, akár névtelenül is</strong><br>
+      → <strong>Üzembe helyezés</strong><br>
+      <strong>5. lépés:</strong> Másold ki az URL-t és illeszd be ide:
+    </div>
+    <label>Google Apps Script Web App URL:</label>
+    <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/AKfyc.../exec" style="font-size:13px;">
+    <div class="row">
+      <div><button type="button" class="btn-submit" style="font-size:14px;" onclick="saveConfig()">Mentés</button></div>
+      <div><button type="button" class="btn-secondary" style="font-size:14px;" onclick="testConnection()">Teszt</button></div>
+    </div>
+  </div>
+
+  <form id="treatmentForm">
+
+    <!-- 1. Páciens alapadatai -->
+    <div class="section">
+      <h2>1. Páciens alapadatai</h2>
+      <label>Teljes név *</label>
+      <input type="text" name="nev" required autocomplete="name">
+      <div class="row">
+        <div>
+          <label>Születési dátum *</label>
+          <input type="date" name="szuletes" required>
+        </div>
+        <div>
+          <label>Telefonszám *</label>
+          <input type="tel" name="telefon" required autocomplete="tel">
+        </div>
+      </div>
+      <label>E-mail</label>
+      <input type="email" name="email" autocomplete="email">
+      <label>Lakcím</label>
+      <input type="text" name="lakcim">
+      <label>Kapcsolattartó / kísérő (opcionális)</label>
+      <input type="text" name="kapcsolattarto">
+      <label>Érkezés oka / fő panasz</label>
+      <textarea name="fo_panasz" rows="2"></textarea>
+    </div>
+
+    <!-- 2. Egészségügyi anamnézis -->
+    <div class="section">
+      <h2>2. Egészségügyi anamnézis</h2>
+      <p style="font-size:13px;color:#888;margin-bottom:12px;">Kérjük jelölje Igennel vagy Nemmel az alábbi kérdéseket.</p>
+
+      <h3>Általános egészségügyi állapot</h3>
+      <div id="health-questions"></div>
+
+      <h3>Bőrre vonatkozó információk</h3>
+      <div id="skin-questions"></div>
+
+      <h3>Női pácienseknél</h3>
+      <div id="female-questions"></div>
+
+      <h3>Implantátumok</h3>
+      <div id="implant-questions"></div>
+
+      <h3>Gyógyszerszedés</h3>
+      <div id="med-questions"></div>
+    </div>
+
+    <!-- 3. ULTIMA ellenjavallatok -->
+    <div class="section">
+      <h2>3. ULTIMA ellenjavallatok</h2>
+      <div class="warning-box">
+        <strong>A kezelés TILOS az alábbi esetekben:</strong><br>
+        Beültetett orvosi eszköz (pacemaker) | Súlyos szív-érrendszeri betegség |
+        Súlyos neuromuszkuláris betegség | Epilepszia | Szemészeti betegségek |
+        Daganatos betegség | Súlyos vesebetegség | Belső vérzés gyanúja |
+        Nem ép bőrfelület | Terhesség | Friss arcműtét (6 hónapon belül)
+      </div>
+      <div class="yn-group">
+        <span class="yn-label"><strong>Ellenjavallat kizárva?</strong></span>
+        <button type="button" class="yn-btn" data-field="ellenjavallat_kizarva" data-val="igen" onclick="ynSelect(this)">Igen</button>
+        <button type="button" class="yn-btn" data-field="ellenjavallat_kizarva" data-val="nem" onclick="ynSelect(this)">Nem</button>
+      </div>
+      <label>Megjegyzés (ha van ellenjavallat)</label>
+      <textarea name="ellenjavallat_megj" rows="2"></textarea>
+    </div>
+
+    <!-- 4. A mai vizit -->
+    <div class="section">
+      <h2>4. A mai vizit</h2>
+      <label>Konzultáció típusa</label>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="radio" name="vizit_tipus" value="Első konzultáció"><span>Első konzultáció</span></label>
+        <label class="checkbox-item"><input type="radio" name="vizit_tipus" value="Kontroll"><span>Kontroll</span></label>
+        <label class="checkbox-item"><input type="radio" name="vizit_tipus" value="Kezelés"><span>Kezelés</span></label>
+      </div>
+      <label>Fő probléma a páciens szerint</label>
+      <textarea name="fo_problema" rows="2"></textarea>
+      <label>Kezelőorvos / kezelő neve</label>
+      <input type="text" name="kezelo_neve">
+      <div class="yn-group">
+        <span class="yn-label">Kiindulási fotók készültek?</span>
+        <button type="button" class="yn-btn" data-field="fotok" data-val="igen" onclick="ynSelect(this)">Igen</button>
+        <button type="button" class="yn-btn" data-field="fotok" data-val="nem" onclick="ynSelect(this)">Nem</button>
+      </div>
+    </div>
+
+    <!-- 5. Kezelési terv -->
+    <div class="section">
+      <h2>5. Kezelési terv (kezelő tölti ki)</h2>
+      <label>Ajánlott kezelések</label>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="ULTIMA Face HILEFT"><span>ULTIMA Face HILEFT</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="ULTIMA Shape"><span>ULTIMA Shape</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Botox"><span>Botox</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Hialuronsavas töltés"><span>Hialuronsavas töltés</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Biostimulátor"><span>Biostimulátor</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Skinbooster"><span>Skinbooster</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Mezoterápia"><span>Mezoterápia</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="kezeles[]" value="Plazmakezelés"><span>Plazmakezelés</span></label>
+      </div>
+      <label>Egyéb kezelés</label>
+      <input type="text" name="egyeb_kezeles">
+      <label>Kezelési protokoll (területek, energia, idő, hatóanyag, mennyiség)</label>
+      <textarea name="protokoll" rows="3"></textarea>
+    </div>
+
+    <!-- 6. Mai elvégzett kezelés -->
+    <div class="section">
+      <h2>6. Mai elvégzett kezelés</h2>
+      <div class="row">
+        <div>
+          <label>Kezelés típusa</label>
+          <input type="text" name="mai_kezeles_tipus">
+        </div>
+        <div>
+          <label>Időtartam (perc)</label>
+          <input type="number" name="idotartam" min="0">
+        </div>
+      </div>
+      <label>Kezelt régiók</label>
+      <input type="text" name="kezelt_regiok">
+      <label>Felhasznált anyagok (ml / típus)</label>
+      <textarea name="anyagok" rows="2"></textarea>
+      <label>Fájdalomérzet (0-5)</label>
+      <div class="pain-scale">
+        <button type="button" class="pain-btn" data-v="0" onclick="painSelect(this)">0</button>
+        <button type="button" class="pain-btn" data-v="1" onclick="painSelect(this)">1</button>
+        <button type="button" class="pain-btn" data-v="2" onclick="painSelect(this)">2</button>
+        <button type="button" class="pain-btn" data-v="3" onclick="painSelect(this)">3</button>
+        <button type="button" class="pain-btn" data-v="4" onclick="painSelect(this)">4</button>
+        <button type="button" class="pain-btn" data-v="5" onclick="painSelect(this)">5</button>
+      </div>
+      <input type="hidden" name="fajdalom" id="fajdalomInput">
+      <div class="yn-group">
+        <span class="yn-label">Mellékhatás / reakció?</span>
+        <button type="button" class="yn-btn" data-field="mellekhat" data-val="nem" onclick="ynSelect(this)">Nem</button>
+        <button type="button" class="yn-btn" data-field="mellekhat" data-val="igen" onclick="ynSelect(this)">Igen</button>
+      </div>
+      <label>Ha igen, leírás</label>
+      <input type="text" name="mellekhat_leiras">
+    </div>
+
+    <!-- 7. Utókezelési javaslat -->
+    <div class="section">
+      <h2>7. Utókezelési javaslat</h2>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" name="utokezeles[]" value="Fényvédő 50 SPF"><span>Fényvédő 50 SPF</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="utokezeles[]" value="Smink 12 óráig tilos"><span>Smink 12 óráig tilos</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="utokezeles[]" value="Szauna/napozás 48-72 óráig tilos"><span>Szauna / napozás 48-72 óráig tilos</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="utokezeles[]" value="Fizikai megterhelés kerülése"><span>Fizikai megterhelés kerülése</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="utokezeles[]" value="Gyulladáscsökkentő krém"><span>Gyulladáscsökkentő krém</span></label>
+      </div>
+      <label>Egyéb javaslat</label>
+      <input type="text" name="egyeb_utokezeles">
+    </div>
+
+    <!-- 8. Hozzájáruló nyilatkozat -->
+    <div class="section">
+      <h2>8. Páciens hozzájáruló nyilatkozat</h2>
+      <div class="consent-text">
+        A páciens kijelenti, hogy:<br>
+        &bull; minden információt megértett,<br>
+        &bull; az ellenjavallatokat átnézte,<br>
+        &bull; vállalja és érti a kezelés kockázatait,<br>
+        &bull; hozzájárul az elvégzett kezelésekhez.
+      </div>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" name="consent_stat"><span>Hozzájárulok névtelen statisztikai célú adatkezeléshez.</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="consent_foto"><span>Hozzájárulok fotó/videó készítéséhez és marketing célú felhasználásához.</span></label>
+        <label class="checkbox-item"><input type="checkbox" name="consent_altalanos" required><span><strong>Elfogadom a fenti nyilatkozatot és hozzájárulok a kezeléshez. *</strong></span></label>
+      </div>
+    </div>
+
+    <!-- 9. Aláírások -->
+    <div class="section">
+      <h2>9. Aláírások</h2>
+      <label><strong>Páciens aláírása</strong></label>
+      <div class="signature-area" id="sig1-area">
+        <span class="sig-label">Rajzoljon ide ujjal...</span>
+        <button type="button" class="sig-clear" onclick="clearSig('sig1')">Törlés</button>
+        <canvas id="sig1" width="700" height="150"></canvas>
+      </div>
+      <div class="divider"></div>
+      <label><strong>Kezelő / orvos aláírása</strong></label>
+      <div class="signature-area" id="sig2-area">
+        <span class="sig-label">Rajzoljon ide ujjal...</span>
+        <button type="button" class="sig-clear" onclick="clearSig('sig2')">Törlés</button>
+        <canvas id="sig2" width="700" height="150"></canvas>
+      </div>
+    </div>
+
+    <!-- Submit buttons -->
+    <button type="button" class="btn-submit" id="submitBtn" onclick="saveForm()">MENTÉS (GOOGLE SHEETS + PDF)</button>
+    <button type="button" class="btn-secondary no-print" onclick="resetForm()">ÚJ PÁCIENS - ŰRLAP TÖRLÉSE</button>
+    <button type="button" class="btn-config no-print" onclick="toggleConfig()">Beállítások</button>
+    <p style="text-align:center;font-size:11px;color:#999;margin:16px 0 40px;">The Ultimate Beauty &copy; 2026 - Digitális Kezelési Lap v2.0</p>
+  </form>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="checkmark">&#10003;</div>
+  <h2 id="successTitle">Sikeresen mentve!</h2>
+  <p id="successMsg">Az adatok elküldve a Google Sheets-be.</p>
+  <p class="sub" id="successSub"></p>
+  <button class="btn-submit" style="max-width:300px" onclick="closeSuccess()">Rendben</button>
+</div>
+
+<script>
+// ============ CONFIG ============
+const STORAGE_KEY = 'tub_sheets_url';
+let SHEETS_URL = localStorage.getItem(STORAGE_KEY) || '';
+
+// Status display
+function updateStatus() {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  if (SHEETS_URL) {
+    dot.className = 'status-dot green';
+    text.textContent = 'Google Sheets kapcsolva';
+  } else {
+    dot.className = 'status-dot yellow';
+    text.innerHTML = 'Google Sheets nincs beállítva – <a href="#" onclick="toggleConfig();return false" style="color:#d4af37">Beállítás</a>';
+  }
+}
+
+function toggleConfig() {
+  const panel = document.getElementById('configPanel');
+  panel.classList.toggle('show');
+  if (SHEETS_URL) {
+    document.getElementById('sheetsUrl').value = SHEETS_URL;
+  }
+}
+
+function saveConfig() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (!url.startsWith('https://script.google.com/')) {
+    alert('Érvénytelen URL! A Google Apps Script URL-nek https://script.google.com/ -al kell kezdődnie.');
+    return;
+  }
+  SHEETS_URL = url;
+  localStorage.setItem(STORAGE_KEY, url);
+  updateStatus();
+  alert('Google Sheets URL elmentve!');
+}
+
+function testConnection() {
+  const url = document.getElementById('sheetsUrl').value.trim() || SHEETS_URL;
+  if (!url) {
+    alert('Adj meg egy URL-t először!');
+    return;
+  }
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot yellow';
+  document.getElementById('statusText').textContent = 'Tesztelés...';
+
+  fetch(url, { method: 'GET', mode: 'no-cors' })
+    .then(() => {
+      dot.className = 'status-dot green';
+      document.getElementById('statusText').textContent = 'Google Sheets kapcsolat OK!';
+      alert('Kapcsolat sikeres! (Ha a Sheet üres, az első mentéskor létrejönnek a fejlécek.)');
+    })
+    .catch(err => {
+      dot.className = 'status-dot red';
+      document.getElementById('statusText').textContent = 'Kapcsolódási hiba';
+      alert('Hiba: ' + err.message);
+    });
+}
+
+// ============ DATE ============
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('hu-HU', {year:'numeric',month:'long',day:'numeric'});
+
+// ============ YES/NO QUESTIONS ============
+const healthQs = [
+  'Szív- és érrendszeri betegség', 'Magas vérnyomás',
+  'Diabetes (cukorbetegség)', 'Pajzsmirigybetegség',
+  'Máj- vagy vesebetegség', 'Autoimmun betegség',
+  'Vérzékenység / véralvadási zavar', 'Epilepszia vagy görcsroham',
+  'Daganatos betegség (jelenleg vagy kórelőzményben)',
+  'Allergia (gyógyszer / lidokain / hialuron / latex stb.)'
+];
+const skinQs = [
+  'Aktív bőrbetegség (ekcéma, psoriasis, dermatitis)',
+  'Keloidos hegképződésre hajlam', 'Melasma / hiperpigmentáció',
+  'Nem ép bőrfelület (seb, gyulladás, fertőzés)'
+];
+const femaleQs = ['Terhesség', 'Szoptatás', 'Nőgyógyászati panaszok'];
+const implantQs = [
+  'Pacemaker, defibrillátor vagy más beültetett elektromos eszköz',
+  'Fém implantátum az arcon vagy testben',
+  'Fogászati implantátum (fontos az ULTIMA miatt)'
+];
+const medQs = [
+  'Véralvadásgátlók', 'Izomlazítók',
+  'Fényérzékenységet okozó gyógyszer', 'Antibiotikum (elmúlt 2 hétben)'
+];
+
+function renderYNQuestions(containerId, questions, prefix) {
+  const el = document.getElementById(containerId);
+  let html = '';
+  questions.forEach((q, i) => {
+    const field = prefix + '_' + i;
+    html += `<div class="yn-group">
+      <span class="yn-label">${q}</span>
+      <button type="button" class="yn-btn" data-field="${field}" data-val="igen" onclick="ynSelect(this)">Igen</button>
+      <button type="button" class="yn-btn" data-field="${field}" data-val="nem" onclick="ynSelect(this)">Nem</button>
+    </div>`;
+  });
+  if (prefix === 'health') {
+    html += '<label>Allergia részletezés (ha van)</label><input type="text" name="allergia_reszlet">';
+  }
+  el.innerHTML = html;
+}
+
+renderYNQuestions('health-questions', healthQs, 'health');
+renderYNQuestions('skin-questions', skinQs, 'skin');
+renderYNQuestions('female-questions', femaleQs, 'female');
+renderYNQuestions('implant-questions', implantQs, 'implant');
+renderYNQuestions('med-questions', medQs, 'med');
+
+// ============ YN LOGIC ============
+const ynValues = {};
+function ynSelect(btn) {
+  const field = btn.dataset.field;
+  const val = btn.dataset.val;
+  ynValues[field] = val;
+  const siblings = btn.parentElement.querySelectorAll('.yn-btn');
+  siblings.forEach(s => s.classList.remove('selected-yes', 'selected-no'));
+  btn.classList.add(val === 'igen' ? 'selected-yes' : 'selected-no');
+}
+
+// ============ PAIN SCALE ============
+function painSelect(btn) {
+  document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('fajdalomInput').value = btn.dataset.v;
+}
+
+// ============ SIGNATURES ============
+function initSignature(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches) {
+      return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
+    }
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  }
+
+  function start(e) { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+  function move(e) {
+    if (!drawing) return; e.preventDefault();
+    const p = getPos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = '#1a1a2e'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+  }
+  function end() { drawing = false; }
+
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+}
+
+function clearSig(id) {
+  const c = document.getElementById(id);
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+}
+
+function isCanvasBlank(id) {
+  const c = document.getElementById(id);
+  const blank = document.createElement('canvas');
+  blank.width = c.width; blank.height = c.height;
+  return c.toDataURL() === blank.toDataURL();
+}
+
+initSignature('sig1');
+initSignature('sig2');
+
+// ============ COLLECT DATA ============
+function collectFormData() {
+  const form = document.getElementById('treatmentForm');
+  const fd = new FormData(form);
+  const data = {};
+
+  // Basic fields
+  fd.forEach((val, key) => {
+    if (key.endsWith('[]')) {
+      const k = key.replace('[]', '');
+      if (!data[k]) data[k] = [];
+      data[k].push(val);
+    } else {
+      data[key] = val;
+    }
+  });
+
+  // Yes/No values
+  Object.assign(data, ynValues);
+
+  // Arrays to strings
+  if (data.kezeles) data.kezelesek = data.kezeles.join(', ');
+  if (data.utokezeles) data.utokezelesek = data.utokezeles.join(', ');
+
+  // Checkboxes as igen/nem
+  data.consent_stat = form.querySelector('[name="consent_stat"]').checked ? 'igen' : 'nem';
+  data.consent_foto = form.querySelector('[name="consent_foto"]').checked ? 'igen' : 'nem';
+  data.consent_altalanos = form.querySelector('[name="consent_altalanos"]').checked ? 'igen' : 'nem';
+
+  // Signatures
+  data.sig1 = !isCanvasBlank('sig1');
+  data.sig2 = !isCanvasBlank('sig2');
+
+  data.timestamp = new Date().toISOString();
+
+  return data;
+}
+
+// ============ SAVE ============
+async function saveForm() {
+  const form = document.getElementById('treatmentForm');
+  const name = form.querySelector('[name="nev"]').value;
+  const consent = form.querySelector('[name="consent_altalanos"]').checked;
+
+  if (!name) { alert('Kérjük adja meg a páciens nevét!'); return; }
+  if (!consent) { alert('A páciens hozzájáruló nyilatkozat elfogadása kötelező!'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'MENTÉS FOLYAMATBAN...';
+
+  const data = collectFormData();
+  let sheetsSaved = false;
+  let sheetsError = '';
+
+  // 1. Send to Google Sheets
+  if (SHEETS_URL) {
+    try {
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      sheetsSaved = true;
+    } catch (err) {
+      sheetsError = err.message;
+      console.error('Sheets error:', err);
+    }
+  }
+
+  // 2. Save to localStorage backup
+  try {
+    const key = 'tub_kezlap_' + name.replace(/\s/g, '_') + '_' + new Date().toISOString().slice(0, 10);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {}
+
+  // 3. Print to PDF
+  window.print();
+
+  // 4. Show success
+  const overlay = document.getElementById('successOverlay');
+  if (sheetsSaved) {
+    document.getElementById('successTitle').textContent = 'Sikeresen mentve!';
+    document.getElementById('successMsg').textContent = 'Google Sheets + PDF + helyi mentés kész.';
+    document.getElementById('successSub').textContent = 'Páciens: ' + name;
+  } else if (SHEETS_URL) {
+    document.getElementById('successTitle').textContent = 'PDF mentve, Sheets hiba';
+    document.getElementById('successMsg').textContent = 'A PDF elkészült, de a Google Sheets küldés sikertelen volt.';
+    document.getElementById('successSub').textContent = sheetsError || 'Ellenőrizd az internet kapcsolatot.';
+  } else {
+    document.getElementById('successTitle').textContent = 'PDF mentve!';
+    document.getElementById('successMsg').textContent = 'A PDF elkészült. Google Sheets nincs beállítva.';
+    document.getElementById('successSub').innerHTML = '<a href="#" onclick="closeSuccess();toggleConfig();return false" style="color:#d4af37">Sheets beállítása</a>';
+  }
+  overlay.classList.add('show');
+
+  btn.disabled = false;
+  btn.textContent = 'MENTÉS (GOOGLE SHEETS + PDF)';
+}
+
+function closeSuccess() {
+  document.getElementById('successOverlay').classList.remove('show');
+}
+
+function resetForm() {
+  if (confirm('Biztosan törli az űrlapot? (A mentett adatok megmaradnak.)')) {
+    document.getElementById('treatmentForm').reset();
+    clearSig('sig1');
+    clearSig('sig2');
+    document.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected-yes', 'selected-no'));
+    document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('selected'));
+    Object.keys(ynValues).forEach(k => delete ynValues[k]);
+    window.scrollTo(0, 0);
+  }
+}
+
+// Init
+updateStatus();
+</script>
+</body>
+</html>
