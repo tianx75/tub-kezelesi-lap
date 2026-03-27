@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kezelési Lap - Adatok exportálása</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #1a1a2e; color: #f0ece4; padding: 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { color: #d4af37; font-size: 20px; text-align: center; margin-bottom: 20px; }
+  .card { background: #222; border: 1px solid #333; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .card h3 { color: #d4af37; margin-bottom: 8px; font-size: 15px; }
+  .card .meta { color: #888; font-size: 12px; margin-bottom: 8px; }
+  .field { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #2a2a2a; font-size: 13px; }
+  .field .label { color: #888; }
+  .field .value { color: #f0ece4; font-weight: 500; text-align: right; max-width: 60%; }
+  .field .value.yes { color: #e74c3c; }
+  .field .value.no { color: #27ae60; }
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .btn-gold { background: linear-gradient(135deg, #d4af37, #b8962e); color: #1a1a2e; }
+  .btn-dark { background: #333; color: #d4af37; }
+  .btn-red { background: #e74c3c; color: #fff; }
+  .empty { text-align: center; padding: 60px 20px; color: #666; }
+  .empty h2 { color: #888; margin-bottom: 12px; }
+  .count { text-align: center; color: #d4af37; font-size: 14px; margin-bottom: 16px; }
+  textarea { width: 100%; min-height: 200px; background: #111; color: #d4af37; border: 1px solid #333; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 11px; margin-top: 8px; }
+  .sheets-setup { background: #1e1e3e; border: 1px solid #d4af37; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .sheets-setup h3 { color: #d4af37; margin-bottom: 8px; }
+  .sheets-setup input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; border-radius: 8px; color: #f0ece4; font-size: 14px; margin: 8px 0; }
+  .status { padding: 8px 12px; border-radius: 8px; font-size: 13px; margin-top: 8px; }
+  .status.ok { background: rgba(39,174,96,0.2); color: #27ae60; }
+  .status.err { background: rgba(231,76,60,0.2); color: #e74c3c; }
+  .status.sending { background: rgba(212,175,55,0.2); color: #d4af37; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>TUB Kezelési Lap — Adatok</h1>
+
+  <!-- Google Sheets setup -->
+  <div class="sheets-setup" id="sheetsSetup">
+    <h3>Google Sheets bekötés</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:8px;">Ha van Apps Script URL, illeszd be ide:</p>
+    <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-gold" onclick="saveSheets()">Mentés</button>
+    <button class="btn btn-dark" onclick="sendAllToSheets()" id="sendBtn" style="display:none">Összes adat küldése Google Sheets-be</button>
+    <div id="sheetsStatus"></div>
+  </div>
+
+  <div class="count" id="countDisplay"></div>
+  <div id="dataContainer"></div>
+
+  <button class="btn btn-dark" onclick="showJSON()" style="margin-top:16px;">JSON export (másolás)</button>
+  <textarea id="jsonOutput" style="display:none;"></textarea>
+
+  <p style="text-align:center;font-size:11px;color:#555;margin-top:20px;">TUB Kezelési Lap Export v1.0</p>
+</div>
+
+<script>
+// Field labels for display
+const FIELD_LABELS = {
+  nev: 'Név', szuletes: 'Születési dátum', telefon: 'Telefon', email: 'E-mail',
+  lakcim: 'Lakcím', kapcsolattarto: 'Kapcsolattartó', fo_panasz: 'Fő panasz',
+  allergia_reszlet: 'Allergia részlet', vizit_tipus: 'Vizit típus',
+  fo_problema: 'Fő probléma', kezelo_neve: 'Kezelő neve',
+  egyeb_kezeles: 'Egyéb kezelés', protokoll: 'Protokoll',
+  mai_kezeles_tipus: 'Mai kezelés', idotartam: 'Időtartam (perc)',
+  kezelt_regiok: 'Régiók', anyagok: 'Anyagok', fajdalom: 'Fájdalom',
+  mellekhat_leiras: 'Mellékhatás leírás', egyeb_utokezeles: 'Egyéb utókezelés',
+  timestamp: 'Időpont', ellenjavallat_megj: 'Ellenjavallat megj.'
+};
+
+const YN_LABELS = {
+  health_0: 'Szív-ér', health_1: 'Magas vérnyomás', health_2: 'Diabetes',
+  health_3: 'Pajzsmirigy', health_4: 'Máj/vese', health_5: 'Autoimmun',
+  health_6: 'Vérzékenység', health_7: 'Epilepszia', health_8: 'Daganat',
+  health_9: 'Allergia', skin_0: 'Aktív bőrbetegség', skin_1: 'Keloid',
+  skin_2: 'Melasma', skin_3: 'Nem ép bőr', female_0: 'Terhesség',
+  female_1: 'Szoptatás', female_2: 'Nőgyógy.', implant_0: 'Pacemaker',
+  implant_1: 'Fém implant', implant_2: 'Fogász. implant',
+  med_0: 'Véralvadásgátló', med_1: 'Izomlazító', med_2: 'Fényérz. gy.',
+  med_3: 'Antibiotikum', ellenjavallat_kizarva: 'Ellenjavallat OK',
+  fotok: 'Fotók készültek', mellekhat: 'Mellékhatás',
+  consent_stat: 'Stat. hozzájárulás', consent_foto: 'Fotó hozzájárulás',
+  consent_altalanos: 'Ált. hozzájárulás'
+};
+
+// Load all patient data from localStorage
+function loadData() {
+  const entries = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('tub_kezlap_')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        data._key = key;
+        entries.push(data);
+      } catch(e) {}
+    }
+  }
+  // Sort by timestamp desc
+  entries.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+  return entries;
+}
+
+function renderData() {
+  const entries = loadData();
+  const container = document.getElementById('dataContainer');
+  const countEl = document.getElementById('countDisplay');
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty"><h2>Nincs mentett adat</h2><p>A páciensek adatai a böngésző localStorage-ában tárolódnak.<br>Ezt az oldalt ugyanazon a böngészőben kell megnyitni, ahol a kezelési lapot kitöltötték.</p></div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  countEl.textContent = entries.length + ' páciens adat található';
+
+  let html = '';
+  entries.forEach((data, idx) => {
+    const name = data.nev || 'Ismeretlen';
+    const date = data.timestamp ? new Date(data.timestamp).toLocaleString('hu-HU') : '?';
+
+    html += `<div class="card" id="card-${idx}">`;
+    html += `<h3>${name}</h3>`;
+    html += `<div class="meta">${date}</div>`;
+
+    // Basic fields
+    for (const [key, label] of Object.entries(FIELD_LABELS)) {
+      if (data[key] && key !== 'timestamp') {
+        html += `<div class="field"><span class="label">${label}</span><span class="value">${data[key]}</span></div>`;
+      }
+    }
+
+    // Yes/No fields from yn_values or direct
+    const ynSource = data.yn_values || data;
+    for (const [key, label] of Object.entries(YN_LABELS)) {
+      const val = ynSource[key] || data[key];
+      if (val) {
+        const cls = val === 'igen' ? 'yes' : 'no';
+        html += `<div class="field"><span class="label">${label}</span><span class="value ${cls}">${val.toUpperCase()}</span></div>`;
+      }
+    }
+
+    // Treatments
+    if (data.kezeles) {
+      const treatments = Array.isArray(data.kezeles) ? data.kezeles.join(', ') : data.kezeles;
+      html += `<div class="field"><span class="label">Kezelések</span><span class="value">${treatments}</span></div>`;
+    }
+    if (data.utokezeles) {
+      const ut = Array.isArray(data.utokezeles) ? data.utokezeles.join(', ') : data.utokezeles;
+      html += `<div class="field"><span class="label">Utókezelés</span><span class="value">${ut}</span></div>`;
+    }
+
+    // Signatures
+    if (data.sig1 && data.sig1 !== 'data:,') {
+      html += `<div class="field"><span class="label">Páciens aláírás</span><span class="value" style="color:#27ae60">VAN ✓</span></div>`;
+    }
+    if (data.sig2 && data.sig2 !== 'data:,') {
+      html += `<div class="field"><span class="label">Kezelő aláírás</span><span class="value" style="color:#27ae60">VAN ✓</span></div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// Google Sheets
+const SHEETS_KEY = 'tub_sheets_url';
+let sheetsUrl = localStorage.getItem(SHEETS_KEY) || '';
+
+if (sheetsUrl) {
+  document.getElementById('sheetsUrl').value = sheetsUrl;
+  document.getElementById('sendBtn').style.display = 'block';
+}
+
+function saveSheets() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (url && url.startsWith('https://script.google.com/')) {
+    sheetsUrl = url;
+    localStorage.setItem(SHEETS_KEY, url);
+    document.getElementById('sendBtn').style.display = 'block';
+    showStatus('URL elmentve!', 'ok');
+  } else {
+    showStatus('Érvénytelen URL', 'err');
+  }
+}
+
+async function sendAllToSheets() {
+  if (!sheetsUrl) { showStatus('Nincs Sheets URL', 'err'); return; }
+
+  const entries = loadData();
+  if (entries.length === 0) { showStatus('Nincs adat', 'err'); return; }
+
+  showStatus('Küldés folyamatban... (0/' + entries.length + ')', 'sending');
+  document.getElementById('sendBtn').disabled = true;
+
+  let sent = 0;
+  for (const data of entries) {
+    // Flatten yn_values
+    const flat = { ...data };
+    if (flat.yn_values) {
+      Object.assign(flat, flat.yn_values);
+      delete flat.yn_values;
+    }
+    // Remove signatures (too large for sheets)
+    delete flat.sig1;
+    delete flat.sig2;
+    delete flat._key;
+
+    // Arrays to strings
+    if (Array.isArray(flat.kezeles)) flat.kezelesek = flat.kezeles.join(', ');
+    if (Array.isArray(flat.utokezeles)) flat.utokezelesek = flat.utokezeles.join(', ');
+
+    try {
+      await fetch(sheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(flat)
+      });
+      sent++;
+      showStatus(`Küldés... (${sent}/${entries.length})`, 'sending');
+    } catch(e) {
+      showStatus(`Hiba a ${sent+1}. adatnál: ${e.message}`, 'err');
+    }
+  }
+
+  showStatus(`✓ ${sent} páciens adat elküldve a Google Sheets-be!`, 'ok');
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function showStatus(msg, type) {
+  document.getElementById('sheetsStatus').innerHTML = `<div class="status ${type}">${msg}</div>`;
+}
+
+function showJSON() {
+  const entries = loadData();
+  const ta = document.getElementById('jsonOutput');
+  ta.style.display = ta.style.display === 'none' ? 'block' : 'none';
+  ta.value = JSON.stringify(entries, null, 2);
+  if (ta.style.display === 'block') {
+    ta.select();
+    try { document.execCommand('copy'); showStatus('JSON másolva a vágólapra!', 'ok'); } catch(e) {}
+  }
+}
+
+renderData();
+</script>
+</body>
+</html>
